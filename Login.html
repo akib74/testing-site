@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>লগইন/রেজিস্ট্রেশন - ক্লিকবাজার</title>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #FF6584;
+            --dark: #2D3748;
+            --light: #F7FAFC;
+            --success: #48BB78;
+            --danger: #E53E3E;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', 'SolaimanLipi', sans-serif;
+        }
+        
+        body {
+            background-color: #F9F9FF;
+            color: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: -1;
+        }
+        
+        /* ট্যাব কন্টেইনার */
+        .auth-container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            backdrop-filter: blur(5px);
+        }
+        
+        /* ইমেজ সাইড */
+        .auth-image {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.8), rgba(255, 101, 132, 0.8));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: white;
+            text-align: center;
+        }
+        
+        .auth-image h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .auth-image p {
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .auth-image img {
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 2rem;
+        }
+        
+        /* ফর্ম সাইড */
+        .auth-form {
+            padding: 3rem;
+        }
+        
+        .form-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #E2E8F0;
+        }
+        
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #A0AEC0;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s;
+        }
+        
+        .tab-btn.active::after {
+            width: 100%;
+        }
+        
+        /* ফর্ম স্টাইল */
+        .form-container {
+            display: none;
+        }
+        
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #A0AEC0;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-right: 0.5rem;
+        }
+        
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 1.5rem;
+        }
+        
+        .submit-btn:hover {
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .social-login {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .social-login p {
+            color: #718096;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .social-login p::before,
+        .social-login p::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 30%;
+            height: 1px;
+            background: #E2E8F0;
+        }
+        
+        .social-login p::before {
+            left: 0;
+        }
+        
+        .social-login p::after {
+            right: 0;
+        }
+        
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EDF2F7;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .social-icon:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .form-footer {
+            text-align: center;
+            color: #718096;
+        }
+        
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* এরর মেসেজ */
+        .error-message {
+            color: var(--danger);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        /* রেস্পন্সিভ ডিজাইন */
+        @media (max-width: 768px) {
+            .auth-container {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+            }
+            
+            .auth-image {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .auth-form {
+                padding: 2rem;
+            }
+            
+            .form-tabs {
+                justify-content: center;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- ইমেজ সাইড -->
+        <div class="auth-image">
+            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="লগইন ইমেজ">
+            <h2>ক্লিকবাজারে স্বাগতম</h2>
+            <p>বাংলাদেশের সেরা এড ক্লিক প্ল্যাটফর্মে আপনার অ্যাকাউন্টে লগইন করুন বা নতুন অ্যাকাউন্ট তৈরি করুন</p>
+        </div>
+        
+        <!-- ফর্ম সাইড -->
+        <div class="auth-form">
+            <div class="form-tabs">
+                <button class="tab-btn active" data-tab="login">লগইন</button>
+                <button class="tab-btn" data-tab="register">রেজিস্ট্রেশন</button>
+            </div>
+            
+            <!-- লগইন ফর্ম -->
+            <div class="form-container active" id="login-form">
+                <h2 class="form-title">অ্যাকাউন্টে লগইন করুন</h2>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="login-email">ইমেইল অ্যাড্রেস</label>
+                        <input type="email" id="login-email" class="form-control" placeholder="আপনার ইমেইল লিখুন" required>
+                        <div class="error-message" id="login-email-error">সঠিক ইমেইল অ্যাড্রেস লিখুন</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">পাসওয়ার্ড</label>
+                        <div class="password-container">
+                            <input type="password" id="login-password" class="form-control" placeholder="আপনার পাসওয়ার্ড লিখুন" required>
+                            <span class="toggle-password" id="toggle-login-password">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="error-message" id="login-password-error">পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার লম্বা হতে হবে</div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="remember-me">
+                            <label for="remember-me">আমাকে মনে রাখুন</label>
+                        </div>
+                        <a href="#" class="forgot-password">পাসওয়ার্ড ভুলে গেছেন?</a>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">লগইন করুন</button>
+                    
+                    <div class="social-login">
+                        <p>অথবা সোশ্যাল মিডিয়া দিয়ে লগইন করুন</p>
+                        <div class="social-icons">
+                            <div class="social-icon">
+                                <i class="fab fa-facebook-f"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <div class="social-icon">
+                                <i class="fab fa-linkedin-in"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-footer">
+                        অ্যাকাউন্ট নেই? <a href="#" id="go-to-register">এখানে রেজিস্টার করুন</a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- রেজিস্ট্রেশন ফর্ম -->
+            <div class="form-container" id="register-form">
+                <h2 class="form-title">নতুন অ্যাকাউন্ট তৈরি করুন</h2>
+                
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="register-name">পূর্ণ নাম</label>
+                        <input type="text" id="register-name" class="form-control" placeholder="আপনার পূর্ণ নাম লিখুন" required>
+                        <div class="error-message" id="register-name-error">নাম অবশ্যই দিতে হবে</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">ইমেইল অ্যাড্রেস</label>
+                        <input type="email" id="register-email" class="form-control" placeholder="আপনার ইমেইল লিখুন" required>
+                        <div class="error-message" id="register-email-error">সঠিক ইমেইল অ্যাড্রেস লিখুন</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-phone">মোবাইল নম্বর</label>
+                        <input type="tel" id="register-phone" class="form-control" placeholder="আপনার মোবাইল নম্বর লিখুন" required>
+                        <div class="error-message" id="register-phone-error">সঠিক মোবাইল নম্বর লিখুন (01XXXXXXXXX)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">পাসওয়ার্ড</label>
+                        <div class="password-container">
+                            <input type="password" id="register-password" class="form-control" placeholder="কমপক্ষে ৬ ক্যারেক্টার" required>
+                            <span class="toggle-password" id="toggle-register-password">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="error-message" id="register-password-error">পাসওয়ার্ড কমপক্ষে ৬ ক্যারেক্টার লম্বা হতে হবে</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-confirm-password">পাসওয়ার্ড নিশ্চিত করুন</label>
+                        <div class="password-container">
+                            <input type="password" id="register-confirm-password" class="form-control" placeholder="পাসওয়ার্ড আবার লিখুন" required>
+                            <span class="toggle-password" id="toggle-register-confirm-password">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="error-message" id="register-confirm-password-error">পাসওয়ার্ড মিলছে না</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="remember-me">
+                            <input type="checkbox" id="agree-terms" required>
+                            <label for="agree-terms">আমি <a href="#" style="color: var(--primary);">শর্তাবলী</a> এবং <a href="#" style="color: var(--primary);">প্রাইভেসি পলিসি</a> পড়েছি এবং সম্মত হয়েছি</label>
+                        </div>
+                        <div class="error-message" id="terms-error">আপনাকে শর্তাবলী মেনে নিতে হবে</div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">রেজিস্টার করুন</button>
+                    
+                    <div class="form-footer">
+                        ইতিমধ্যে অ্যাকাউন্ট আছে? <a href="#" id="go-to-login">লগইন করুন</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ট্যাব সুইচিং
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const formContainers = document.querySelectorAll('.form-container');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // সব ট্যাব এবং ফর্ম থেকে active ক্লাস রিমুভ
+                tabBtns.forEach(btn => btn.classList.remove('active'));
+                formContainers.forEach(container => container.classList.remove('active'));
+                
+                // ক্লিক করা ট্যাব এবং সংশ্লিষ্ট ফর্মে active ক্লাস অ্যাড
+                this.classList.add('active');
+                document.getElementById(`${tabId}-form`).classList.add('active');
+            });
+        });
+        
+        // লগইন/রেজিস্ট্রেশন লিংক ক্লিক
+        document.getElementById('go-to-register').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.tab-btn[data-tab="register"]').click();
+        });
+        
+        document.getElementById('go-to-login').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.tab-btn[data-tab="login"]').click();
+        });
+        
+        // পাসওয়ার্ড টগল
+        const togglePassword = (inputId, toggleId) => {
+            const passwordInput = document.getElementById(inputId);
+            const toggleBtn = document.getElementById(toggleId);
+            
+            toggleBtn.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+            });
+        };
+        
+        togglePassword('login-password', 'toggle-login-password');
+        togglePassword('register-password', 'toggle-register-password');
+        togglePassword('register-confirm-password', 'toggle-register-confirm-password');
+        
+        // ফর্ম ভ্যালিডেশন
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+            
+            // ইমেইল ভ্যালিডেশন
+            const email = document.getElementById('login-email').value;
+            const emailError = document.getElementById('login-email-error');
+            
+            if(!isValidEmail(email)) {
+                emailError.style.display = 'block';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
+            
+            // পাসওয়ার্ড ভ্যালিডেশন
+            const password = document.getElementById('login-password').value;
+            const passwordError = document.getElementById('login-password-error');
+            
+            if(password.length < 6) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            if(isValid) {
+                alert('লগইন সফল! ড্যাশবোর্ডে রিডাইরেক্ট করা হচ্ছে...');
+                // window.location.href = 'dashboard.html';
+            }
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+            
+            // নাম ভ্যালিডেশন
+            const name = document.getElementById('register-name').value;
+            const nameError = document.getElementById('register-name-error');
+            
+            if(name.trim() === '') {
+                nameError.style.display = 'block';
+                isValid = false;
+            } else {
+                nameError.style.display = 'none';
+            }
+            
+            // ইমেইল ভ্যালিডেশন
+            const email = document.getElementById('register-email').value;
+            const emailError = document.getElementById('register-email-error');
+            
+            if(!isValidEmail(email)) {
+                emailError.style.display = 'block';
+                isValid = false;
+            } else {
+                emailError.style.display = 'none';
+            }
+            
+            // ফোন ভ্যালিডেশন
+            const phone = document.getElementById('register-phone').value;
+            const phoneError = document.getElementById('register-phone-error');
+            
+            if(!isValidPhone(phone)) {
+                phoneError.style.display = 'block';
+                isValid = false;
+            } else {
+                phoneError.style.display = 'none';
+            }
+            
+            // পাসওয়ার্ড ভ্যালিডেশন
+            const password = document.getElementById('register-password').value;
+            const passwordError = document.getElementById('register-password-error');
+            
+            if(password.length < 6) {
+                passwordError.style.display = 'block';
+                isValid = false;
+            } else {
+                passwordError.style.display = 'none';
+            }
+            
+            // কনফার্ম পাসওয়ার্ড ভ্যালিডেশন
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            const confirmPasswordError = document.getElementById('register-confirm-password-error');
+            
+            if(password !== confirmPassword) {
+                confirmPasswordError.style.display = 'block';
+                isValid = false;
+            } else {
+                confirmPasswordError.style.display = 'none';
+            }
+            
+            // টার্মস এন্ড কন্ডিশন
+            const termsChecked = document.getElementById('agree-terms').checked;
+            const termsError = document.getElementById('terms-error');
+            
+            if(!termsChecked) {
+                termsError.style.display = 'block';
+                isValid = false;
+            } else {
+                termsError.style.display = 'none';
+            }
+            
+            if(isValid) {
+                alert('রেজিস্ট্রেশন সফল! লগইন পৃষ্ঠায় রিডাইরেক্ট করা হচ্ছে...');
+                document.querySelector('.tab-btn[data-tab="login"]').click();
+                this.reset();
+            }
+        });
+        
+        // হেল্পার ফাংশন
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+        
+        function isValidPhone(phone) {
+            const re = /^01[3-9]\d{8}$/;
+            return re.test(phone);
+        }
+        
+        // সোশ্যাল লগইন বাটন
+        document.querySelectorAll('.social-icon').forEach(icon => {
+            icon.addEventListener('click', function() {
+                let platform = '';
+                if(this.querySelector('.fa-facebook-f')) platform = 'Facebook';
+                else if(this.querySelector('.fa-google')) platform = 'Google';
+                else if(this.querySelector('.fa-linkedin-in')) platform = 'LinkedIn';
+                
+                alert(`${platform} দিয়ে লগইন করার প্রক্রিয়া শুরু করা হচ্ছে...`);
+            });
+        });
+    </script>
+</body>
+</html>
